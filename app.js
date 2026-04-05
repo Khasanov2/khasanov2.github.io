@@ -1,105 +1,79 @@
 const BOT_TOKEN = '8796581956:AAHsovDFSw-vH0P2IQAYCwVXuPE29aL7w6o';
 const MY_ID = '7565907631';
 
-// 1. TELEGRAM AUTH
 window.onTelegramAuth = function(user) {
     localStorage.setItem('khasanov_user', JSON.stringify(user));
     activateSite(user);
-
-    const text = `🚀 Kirish: ${user.first_name} (@${user.username || 'n/a'}) ID: ${user.id}`;
-    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${MY_ID}&text=${encodeURIComponent(text)}`);
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${MY_ID}&text=${encodeURIComponent("🚀 Login: " + user.first_name)}`);
 };
 
-// 2. SAYTNI ISHGA TUSHIRISH
 function activateSite(user) {
-    const overlay = document.getElementById('auth-overlay');
-    const main = document.getElementById('main-content');
-    
-    if(overlay) overlay.style.display = 'none';
-    if(main) main.classList.add('active');
-
-    const info = document.getElementById('user-info-bar');
+    document.getElementById('auth-overlay').style.display = 'none';
+    document.getElementById('main-content').classList.add('active');
     const isMaster = String(user.id) === MY_ID;
-
-    if(info) {
-        info.innerHTML = `
-            <div style="margin:20px 0; border-bottom:1px solid #333; padding-bottom:10px; display:flex; align-items:center;">
-                <img src="${user.photo_url || ''}" style="width:30px; border-radius:50%; border:1px solid #00ff41;">
-                <span style="color:#00ff41; margin-left:10px;">${user.first_name}</span>
-                ${isMaster ? '<b style="color:gold; margin-left:10px;">[MASTER_ADMIN]</b>' : ''}
-            </div>`;
-    }
+    document.getElementById('user-info-bar').innerHTML = `<span style="color:#00ff41;">● ${user.first_name} ${isMaster ? '[ADMIN]' : ''}</span>`;
 }
 
-// 3. SAHIFA YUKLANGANDA
 window.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem('khasanov_user');
     if(saved) activateSite(JSON.parse(saved));
 });
 
-// 4. O'YINLAR VA MODAL
 function openSection(type) {
     const modal = document.getElementById('modal');
     const content = document.getElementById('modal-content');
-    const user = JSON.parse(localStorage.getItem('khasanov_user') || '{}');
     modal.style.display = 'flex';
+    const user = JSON.parse(localStorage.getItem('khasanov_user') || '{}');
 
     if(type === 'games') {
-        const games = ['math', 'guess', 'react', 'binary', 'type', 'logic', 'reverse', 'emoji', 'colors', 'capital', 'code', 'iq'];
-        content.innerHTML = `<h2 style="color:#00ff41">🎮 12_GAMES_HUB</h2>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; max-height:350px; overflow-y:auto; padding:10px;">
-            ${games.map(g => `<button class="game-btn" onclick="play('${g}')">${g.toUpperCase()}</button>`).join('')}
+        const gList = ['math','guess','react','binary','type','logic','reverse','emoji','colors','capital','code','iq'];
+        content.innerHTML = `<h2 style="color:#00ff41">🎮 12 GAMES HUB</h2>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            ${gList.map(g => `<button class="game-btn" onclick="play('${g}')">${g.toUpperCase()}</button>`).join('')}
         </div>`;
     } else if(type === 'leaderboard') {
         showLeaderboard();
     } else if(type === 'admin' && String(user.id) === MY_ID) {
-        content.innerHTML = `<h2 style="color:gold">ADMIN</h2><button class="admin-btn" onclick="clearLeaderboard()">CLEAR LEADERBOARD</button>`;
-    } else {
-        content.innerHTML = `<h2>INFO</h2><p>Bo'lim tayyorlanmoqda...</p>`;
+        content.innerHTML = `<h2>ADMIN</h2><button class="admin-btn" onclick="localStorage.removeItem('leaderboard'); location.reload();">RESET ALL</button>`;
     }
 }
 
-// 5. O'YIN LOGIKASI
 function play(game) {
     const user = JSON.parse(localStorage.getItem('khasanov_user'));
-    let start = Date.now();
-    let score = 0;
+    let s = Date.now(), score = 0, q = "";
 
-    if(game === 'math') {
-        let a = Math.floor(Math.random()*90)+10, b = Math.floor(Math.random()*90)+10;
-        if(prompt(`${a} + ${b} = ?`) == (a+b)) score = 10;
-    } else if(game === 'iq') {
-        if(prompt("2, 4, 8, 16, ... keyingi son?") == "32") score = 15;
-    } else if(game === 'reverse') {
-        if(prompt("'GITHUB' so'zini teskari yozing:") === "BUHTIG") score = 10;
-    } 
-    // Boshqa o'yinlar mantiqi...
+    if(game==='math') { let a=Math.floor(Math.random()*50), b=Math.floor(Math.random()*50); if(prompt(`${a}+${b}=?`) == a+b) score=10; }
+    else if(game==='guess') { let n=Math.floor(Math.random()*10)+1; if(prompt("1-10 son?") == n) score=10; }
+    else if(game==='iq') { if(prompt("2,4,8,16...?") == "32") score=20; }
+    else if(game==='reverse') { if(prompt("OLMA teskarisi?") == "AMLO") score=10; }
+    else if(game==='binary') { if(prompt("5 ning binary kodi (101)?") == "101") score=15; }
+    else if(game==='type') { let w="KHASANOV"; if(prompt(`Yozing: ${w}`) === w) score=10; }
+    else if(game==='logic') { if(prompt("Qaysi oyda 28 kun bor? (Hamma/Fevral)").toLowerCase().includes("hamma")) score=20; }
+    else if(game==='emoji') { if(prompt("🍎+🍌=? (meva/ovqat)").toLowerCase() === "meva") score=5; }
+    else if(game==='colors') { if(prompt("Qizil + Sariq = ? (Olovrang/Yashil)").toLowerCase() === "olovrang") score=15; }
+    else if(game==='capital') { if(prompt("O'zbekiston poytaxti?").toLowerCase() === "toshkent") score=10; }
+    else if(game==='code') { if(prompt("HTML nima? (Til/Dastur)").toLowerCase() === "til") score=10; }
+    else if(game==='react') { alert("Tayyor turing!"); setTimeout(()=> { alert("BOSING!"); score=10; finish(user,game,score,s); }, 1000); return; }
 
-    finish(user, game, score, start);
+    finish(user, game, score, s);
 }
 
-function finish(user, game, score, start) {
-    const time = ((Date.now() - start) / 1000).toFixed(2);
-    alert(`Natija: ${score} ball | Vaqt: ${time}s`);
-
-    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${MY_ID}&text=${encodeURIComponent(`🎮 O'YIN: ${game}\n👤 User: ${user.first_name}\n📊 Ball: ${score}\n⏱ Vaqt: ${time}s`)}`);
-
-    let lb = JSON.parse(localStorage.getItem('leaderboard') || '[]');
-    lb.push({name: user.first_name, game, score, time});
-    localStorage.setItem('leaderboard', JSON.stringify(lb));
+function finish(u, g, sc, s) {
+    const t = ((Date.now()-s)/1000).toFixed(2);
+    if(sc>0) {
+        alert(`Yutdingiz! Ball: ${sc}`);
+        let lb = JSON.parse(localStorage.getItem('leaderboard')||'[]');
+        lb.push({name:u.first_name, game:g, score:sc, time:t});
+        localStorage.setItem('leaderboard', JSON.stringify(lb));
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${MY_ID}&text=${encodeURIComponent(`🎮 ${g}\n👤 ${u.first_name}\n📊 ${sc}\n⏱ ${t}s`)}`);
+    } else alert("Xato yoki vaqt tugadi!");
 }
 
 function showLeaderboard() {
-    const content = document.getElementById('modal-content');
-    let lb = JSON.parse(localStorage.getItem('leaderboard') || '[]');
-    lb.sort((a,b) => b.score - a.score);
-    content.innerHTML = `<h2>🏆 TOP PLAYERS</h2>
-    <table style="width:100%; font-size:12px;">
-        <tr><th>User</th><th>Game</th><th>Score</th></tr>
-        ${lb.slice(0,10).map(i => `<tr><td>${i.name}</td><td>${i.game}</td><td>${i.score}</td></tr>`).join('')}
-    </table>`;
+    let lb = JSON.parse(localStorage.getItem('leaderboard')||'[]');
+    lb.sort((a,b)=>b.score-a.score);
+    document.getElementById('modal-content').innerHTML = `<h2>🏆 TOP</h2><table>${lb.slice(0,5).map(i=>`<tr><td>${i.name}</td><td>${i.score}</td></tr>`).join('')}</table>`;
 }
 
-function closeModal() { document.getElementById('modal').style.display = 'none'; }
+function closeModal() { document.getElementById('modal').style.display='none'; }
 function logout() { localStorage.removeItem('khasanov_user'); location.reload(); }
-function clearLeaderboard() { localStorage.removeItem('leaderboard'); alert("Tozalandi"); closeModal(); }
