@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KHASANOV_NETWORK_PRO</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- AUTH OVERLAY -->
+    <div id="auth-overlay" class="overlay">
+        <div class="auth-card">
+            <h2 class="gold-text">SYSTEM_ACCESS</h2>
+            <p style="margin-bottom: 25px; color: #00ff41;">Davom etish uchun Telegram orqali kiring:</p>
+            <div id="tg-login-container">
+                <script src="https://telegram.org/js/telegram-widget.js?22" 
+                    data-telegram-login="khasanov_mybot" 
+                    data-size="large" 
+                    data-onauth="onTelegramAuth(user)" 
+                    data-request-access="write"></script>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main id="main-content" class="main-container">
+        <header>
+            <h1 class="logo">KHASANOV<span class="neon-text">_NETWORK</span></h1>
+            <div id="user-info-bar" class="user-bar"></div>
+        </header>
+
+        <div class="card-grid">
+            <div class="card" onclick="openSection('games')">
+                <div class="icon">🎮</div>
+                <h3>GAMES_HUB</h3>
+            </div>
+            <div class="card" onclick="openSection('leaderboard')">
+                <div class="icon">🏆</div>
+                <h3>LEADERBOARD</h3>
+            </div>
+            <div class="card" id="admin-card" onclick="openSection('admin')">
+                <div class="icon">🛠️</div>
+                <h3>ADMIN_PANEL</h3>
+            </div>
+        </div>
+
+        <button class="logout-btn" onclick="logout()">LOGOUT</button>
+    </main>
+
+    <!-- MODAL -->
+    <div id="modal" class="modal-bg">
+        <div class="modal-box">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
